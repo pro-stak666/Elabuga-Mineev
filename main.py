@@ -3,12 +3,13 @@ from PyQt5.QtGui import QPainter, QPixmap, QPen, QColor
 from PyQt5 import uic
 from random import randint
 import sys
+from ui import *
 
 
-class Example(QWidget):
+class Example(QWidget, Ui_Form):
     def __init__(self):
         super().__init__()
-        uic.loadUi('UI.ui', self)
+        self.setupUi(self)
         self.setFixedSize(600, 500)
         self.do_paint = False
         self.pushButton.clicked.connect(self.paint)
@@ -28,7 +29,7 @@ class Example(QWidget):
 
     def draw_flag(self, qp):
         try:
-            qp.setBrush(QColor('yellow'))
+            qp.setBrush(QColor(randint(0, 255), randint(0, 255), randint(0, 255)))
             w = randint(10, 400)
             qp.drawEllipse(480 - w, 400 - w, w, w)
         except Exception:

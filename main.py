@@ -1,39 +1,25 @@
-from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QLabel, QGridLayout
-from PyQt5.QtGui import QPainter, QPixmap, QPen, QColor
+from PyQt5.QtWidgets import QWidget, QApplication, QTableWidgetItem
 from PyQt5 import uic
-from random import randint
 import sys
-from ui import *
+import sqlite3
 
 
-class Example(QWidget, Ui_Form):
+class Example(QWidget):
     def __init__(self):
         super().__init__()
-        self.setupUi(self)
-        self.setFixedSize(600, 500)
-        self.do_paint = False
-        self.pushButton.clicked.connect(self.paint)
+        uic.loadUi('main.ui', self)
+        self.setFixedSize(800, 600)
+        with sqlite3.connect("coffee.sqlite") as db:
+            cur = db.cursor()
+            headers_names = cur.execute("SELECT * FROM coffee").description
+            self.tableWidget.setHorizontalHeaderLabels(([i[0] for i in headers_names]))
 
-    def paintEvent(self, event):
-        if self.do_paint:
-            qp = QPainter()
-            qp.begin(self)
-            self.draw_flag(qp)
-            qp.end()
-            print("end")
-
-    def paint(self):
-        self.do_paint = True
-        self.repaint()
-        self.do_paint = False
-
-    def draw_flag(self, qp):
-        try:
-            qp.setBrush(QColor(randint(0, 255), randint(0, 255), randint(0, 255)))
-            w = randint(10, 400)
-            qp.drawEllipse(480 - w, 400 - w, w, w)
-        except Exception:
-            print("1")
+            res = cur.execute(f"SELECT * FROM coffee").fetchall()
+            print(res)
+            for i, row in enumerate(res):
+                self.tableWidget.setRowCount(self.tableWidget.rowCount() + 1)
+                for j, elem in enumerate(row):
+                    self.tableWidget.setItem(i, j, QTableWidgetItem(str(elem)))
 
 
 if __name__ == '__main__':
